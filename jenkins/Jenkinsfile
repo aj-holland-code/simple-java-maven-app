@@ -1,28 +1,19 @@
 pipeline
 {
-
   agent none
 
   stages {
-    
-    stage('build') 
+    stage('build')
     {
       steps {
-        echo "This is the build stage..."
+        sh 'mvn clean package'
       }
     }
 
-    stage('test')
-    {
-      steps {
-        echo "This is the test stage..."
-      }
-    }
-
-    stage('deploy')
-    {
-      steps {
-        echo "This is the deploy stage..."
+    post {
+      success {
+        // One or more steps need to be included within each condition's block.
+        archiveArtifacts artifacts: '**/target/*.war'
       }
     }
   }
