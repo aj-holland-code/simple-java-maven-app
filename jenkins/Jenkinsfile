@@ -34,20 +34,20 @@ pipeline
 
           bat 'mvn clean package -DskipTests=true'
           echo "Hello, $NAME ${params.LASTNAME}!"
-      }
+        }
     }
 
     stage('test') {
       parallel {
         stage('testA') {
-           steps {
-            echo 'Running test A...'           
+          steps {
+            echo 'Running test A...'
           }
         }
 
         stage('testB') {
           steps {
-            echo 'Running test B...'            
+            echo 'Running test B...'
           }
         }
       }
@@ -69,11 +69,11 @@ pipeline
     }
 
     stage('deploy_dev') {
-      when { 
+      when {
         expression {
           params.select_environment == 'dev'
-          }
-        
+        }
+
         beforeAgent true
       }
 
@@ -83,7 +83,21 @@ pipeline
           echo 'Simulating deployment to DEVELOPMENT...'
 
           bat 'dir target'
-      } // end of steps for stage deploy-dev      
-    } // end of stage deploy-dev   
+      } // end of steps for stage deploy-dev
+    } // end of stage deploy-dev
+
+    stage('deploy_prod') {
+      when {
+        expression {
+            params.select_environment == 'prod'
+        }
+        beforeAgent true
+      }
+      steps {
+        unstash 'maven-build'
+        echo 'Simulating deployment to PRODUCTION...'
+        bat 'dir target'
+      }
+    }
   } // end of stages
 }
