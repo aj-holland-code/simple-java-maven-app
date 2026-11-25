@@ -28,7 +28,7 @@ pipeline
     {
         steps {
           script {
-            def helper = load 'jenkins/script.groovy'
+            def helper = load 'jenkins/scripts/script.groovy'
             helper.hello()
           }
 
