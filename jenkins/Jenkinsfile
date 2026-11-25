@@ -9,7 +9,7 @@ pipeline
       description: 'Enter a surname'
     )
     choice(
-      name: 'select _environment',
+      name: 'select_environment',
       choices: ['dev', 'prod'],
       description: 'Select deployment environment'
     )
