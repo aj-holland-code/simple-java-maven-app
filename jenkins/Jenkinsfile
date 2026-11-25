@@ -6,15 +6,13 @@ pipeline
     string defaultValue: 'Bullock', name: 'LASTNAME'
   }
 
-
   environment {
-    NAME = "Seth"
+    NAME = 'Seth'
   }
 
   tools {
     maven 'mymaven'
   }
-
 
   stages {
     stage('build')
@@ -22,29 +20,29 @@ pipeline
       steps {
         bat 'mvn clean package'
         echo "Hello, $NAME ${params.LASTNAME}!"
-      }     
-    }
-  }
-
-  stage('test') {
-    parallel {
-      stage('testA') {
-        steps {
-          echo "Running test A..."
-        }
-      }
-      stage('testB') {
-        steps {
-          echo "Running test A..."
-        }
       }
     }
 
-    post {
-      success {
-        echo "Archive the JAR..."
-        // One or more steps need to be included within each condition's block.
-        archiveArtifacts artifacts: '**/target/*.jar'
+    stage('test') {
+      parallel {
+        stage('testA') {
+          steps {
+            echo 'Running test A...'
+          }
+        }
+        stage('testB') {
+          steps {
+            echo 'Running test A...'
+          }
+        }
+      }
+
+      post {
+        success {
+          echo 'Archive the JAR...'
+          // One or more steps need to be included within each condition's block.
+          archiveArtifacts artifacts: '**/target/*.jar'
+        }
       }
     }
   }
