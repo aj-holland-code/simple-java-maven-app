@@ -3,7 +3,16 @@ pipeline
   agent any
 
   parameters {
-    string defaultValue: 'Bullock', name: 'LASTNAME'
+    string(
+      name: 'LASTNAME',
+      defaultValue: 'Bullock',
+      description: 'Enter a surname'
+    )
+    choice(
+      name: 'select _environment',
+      choices: ['dev', 'prod'],
+      description: 'Select deployment environment'
+    )
   }
 
   environment {
@@ -17,33 +26,64 @@ pipeline
   stages {
     stage('build')
     {
-      steps {
-        bat 'mvn clean package'
-        echo "Hello, $NAME ${params.LASTNAME}!"
+        steps {
+          script {
+            def helper = load 'jenkins/script.groovy'
+            helper.hello()
+          }
+
+          bat 'mvn clean package -DskipTests=true'
+          echo "Hello, $NAME ${params.LASTNAME}!"
       }
     }
 
     stage('test') {
       parallel {
         stage('testA') {
-          steps {
-            echo 'Running test A...'
+           steps {
+            echo 'Running test A...'           
           }
         }
+
         stage('testB') {
           steps {
-            echo 'Running test A...'
+            echo 'Running test B...'            
           }
         }
       }
 
       post {
         success {
-          echo 'Archive the JAR...'
-          // One or more steps need to be included within each condition's block.
-          archiveArtifacts artifacts: '**/target/*.jar'
+          echo 'Stashing the JAR...'
+
+          stash(
+            name: 'maven-build',
+            includes: 'target/*.jar'
+          )
+
+          echo 'Archiving the JAR...'
+
+          archiveArtifacts artifacts: 'target/*.jar'
         }
       }
     }
-  }
+
+    stage('deploy_dev') {
+      when { 
+        expression {
+          params.select_environment == 'dev'
+          }
+        
+        beforeAgent true
+      }
+
+      steps {
+          unstash 'maven-build'
+
+          echo 'Simulating deployment to DEVELOPMENT...'
+
+          bat 'dir target'
+      } // end of steps for stage deploy-dev      
+    } // end of stage deploy-dev   
+  } // end of stages
 }
