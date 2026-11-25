@@ -2,6 +2,15 @@ pipeline
 {
   agent any
 
+  parameters {
+    string defaultValue: 'Bullock', name: 'LASTNAME'
+  }
+
+
+  environment {
+    NAME = "Seth"
+  }
+
   tools {
     maven 'mymaven'
   }
@@ -12,6 +21,7 @@ pipeline
     {
       steps {
         bat 'mvn clean package'
+        echo "hello $NAME ${params.LASTNAME}"
       }
 
       post {
